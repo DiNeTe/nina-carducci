@@ -114,46 +114,38 @@
         .attr("src", element.attr("src"));
       $(`#${lightboxId}`).modal("toggle");
     },
-    prevImage() {
-      // Recupere l'image affiché dans la lightbox
-      let lightboxSrc = $(".lightboxImage").attr("src");
-      // Construction de la collection d'images
-      let imagesCollection = $(".gallery-item")
-        .map(function () {
-          return $(this); // Renvoie chaque élément de la galerie
-        })
-        .get(); // Convertit le résultat en un tableau JS
-
-      let index = 0;
-      $(imagesCollection).each(function (i) {
-        // Obtention du src de l'image actuelle
-        let currentDOMImageSrc = $(this).attr("src");
-        if (lightboxSrc === currentDOMImageSrc) {
-          index = i;
-        }
-      });
-      let prevIndex = index > 0 ? index - 1 : imagesCollection.length - 1;
-      // Récupère la source de l'image précédente en utilisant l'index calculé.
-      let prevImageSrc = $(imagesCollection[prevIndex]).attr("src");
-      $(".lightboxImage").attr("src", prevImageSrc);
+    prevImage(lightboxId) {
+      // Récupère l'élément de l'image actuellement affichée dans la lightbox.
+      let lightboxImage = $(`#${lightboxId} .lightboxImage`);
+      // Récupère l'URL de l'image actuellement affichée dans la lightbox.
+      let currentSrc = lightboxImage.attr("src");
+      // Sélectionne uniquement les images visibles dans la galerie.
+      let visibleImages = $(".gallery-item:visible");
+      // Trouve l'index de l'image actuelle parmi les images visibles en filtrant par src.
+      let currentIndex = visibleImages.index(
+        visibleImages.filter(`[src='${currentSrc}']`)
+      );
+      // Calcule l'index de l'image précédente. S'il s'agit de la première image, l'index de la dernière image est utilisé.
+      let prevIndex =
+        currentIndex > 0 ? currentIndex - 1 : visibleImages.length - 1;
+      // Récupère le src de l'image précédente en utilisant l'index calculé.
+      let prevImageSrc = $(visibleImages[prevIndex]).attr("src");
+      // Met à jour le src de l'image dans la lightbox pour afficher l'image précédente.
+      lightboxImage.attr("src", prevImageSrc);
     },
-    nextImage() {
-      let lightboxSrc = $(".lightboxImage").attr("src");
-      let imagesCollection = $(".gallery-item")
-        .map(function () {
-          return $(this);
-        })
-        .get();
-      let index = 0;
-      $(imagesCollection).each(function (i) {
-        let currentDOMImageSrc = $(this).attr("src");
-        if (lightboxSrc === currentDOMImageSrc) {
-          index = i;
-        }
-      });
-      let nextIndex = index < imagesCollection.length - 1 ? index + 1 : 0;
-      let nextImageSrc = $(imagesCollection[nextIndex]).attr("src");
-      $(".lightboxImage").attr("src", nextImageSrc);
+    nextImage(lightboxId) {
+      let lightboxImage = $(`#${lightboxId} .lightboxImage`);
+      let currentSrc = lightboxImage.attr("src");
+      let visibleImages = $(".gallery-item:visible");
+      let currentIndex = visibleImages.index(
+        visibleImages.filter(`[src='${currentSrc}']`)
+      );
+      // Calcule l'index de l'image suivante. Si l'index courant est le dernier, il retourne à 0 (première image).
+      let nextIndex =
+        currentIndex < visibleImages.length - 1 ? currentIndex + 1 : 0;
+      // Récupère le src de l'image suivante en utilisant l'index calculé.
+      let nextImageSrc = $(visibleImages[nextIndex]).attr("src");
+      lightboxImage.attr("src", nextImageSrc);
     },
     createLightBox(gallery, lightboxId, navigation) {
       gallery.append(`<div class="modal fade" id="${
